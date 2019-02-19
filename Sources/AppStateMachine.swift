@@ -15,7 +15,8 @@ class AppStateMachine {
 	private enum State {
 	
 		case dormant
-		case pendingArticleAdd
+		case validDragInside
+		case invalidDragInside
 		case addingArticle
 		case showingStatusFromAddingArticle
 	
@@ -38,6 +39,9 @@ class AppStateMachine {
 		case highlight
 		case unhighlight
 		
+		case switchToInvalidCursor
+		case switchToDefaultCursor
+		
 		case switchToDefaultIcon
 		case switchToInProgressIcon
 		case switchToSuccessIcon
@@ -49,24 +53,40 @@ class AppStateMachine {
 	
 	//	MARK: - Actions
 	
+	func userEnteredWithInvalidDrag() -> Commands {
+		guard state == .dormant else { return [] }
+		
+		state = .invalidDragInside
+		
+		return [ .switchToInvalidCursor ]
+	}
+	
 	func userEnteredWithValidDrag() -> Commands {
 		guard state == .dormant else { return [] }
 		
-		state = .pendingArticleAdd
+		state = .validDragInside
 		
 		return [ .highlight ]
 	}
 	
 	func userExitedDrag() -> Commands {
-		guard state == .pendingArticleAdd else { return [] }
-		
-		state = .dormant
-		
-		return [ .unhighlight ]
+		switch state {
+			case .validDragInside:
+				state = .dormant
+				
+				return [ .unhighlight ]
+			
+			case .invalidDragInside:
+				state = .dormant
+				
+				return [ .switchToDefaultCursor ]
+			
+			default: return []
+		}
 	}
 	
 	func userDroppedArticle() -> Commands {
-		guard state == .pendingArticleAdd else { return [] }
+		guard state == .validDragInside else { return [] }
 		
 		state = .addingArticle
 		

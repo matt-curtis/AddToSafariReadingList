@@ -101,12 +101,8 @@ class StatusItemManager: NSObject, NSWindowDelegate, NSDraggingDestination {
 		return false
 	}
 	
-	func draggingEnded(_ sender: NSDraggingInfo) {
-		dragDelegate?.dragExitedOrEnded()
-	}
-	
 	func draggingExited(_ sender: NSDraggingInfo?) {
-		dragDelegate?.dragExitedOrEnded()
+		dragDelegate?.dragExited()
 	}
 	
 	
@@ -128,6 +124,6 @@ protocol StatusItemManagerDragDelegate: class {
 	
 	func performDropAction(withPasteboard pasteboard: NSPasteboard) -> Bool
 	
-	func dragExitedOrEnded()
+	func dragExited()
 
 }

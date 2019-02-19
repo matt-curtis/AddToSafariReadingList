@@ -81,6 +81,8 @@ import Cocoa
 			stateMachine.shouldAcceptDrops,
 			parseURLs(onPasteboard: pasteboard).count > 0
 		else {
+			performCommands { $0.userEnteredWithInvalidDrag() }
+			
 			return false
 		}
 	
@@ -99,7 +101,7 @@ import Cocoa
 		return true
 	}
 	
-	func dragExitedOrEnded() {
+	func dragExited() {
 		performCommands { $0.userExitedDrag() }
 	}
 	
@@ -152,6 +154,12 @@ import Cocoa
 	
 	private func perform(command: AppStateMachine.Command) {
 		switch command {
+			case .switchToInvalidCursor:
+				NSCursor.operationNotAllowed.push()
+			
+			case .switchToDefaultCursor:
+				NSCursor.operationNotAllowed.pop()
+			
 			case .highlight:
 				statusItemManager.setIsHighlighted(true)
 			
